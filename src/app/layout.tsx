@@ -1,31 +1,35 @@
+'use server'
+
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ui/theme-provider";
+import Providers from "@/components/providers";
+import Header from "@/components/header";
+import { Session, getServerSession } from "next-auth";
+import { Toaster } from "@/components/ui/sonner";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Nchat - Your Chat App",
   description: "NChat is a webchat with Next.js & Socket.io",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions)
+
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+      <body className='min-h-screen'>
+        <Providers session={session as Session}>
+          <div>
+            <Header />
+            <Toaster richColors />
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );
