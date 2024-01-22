@@ -18,6 +18,7 @@ import { v4 as uuid } from 'uuid'
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { User } from '@/@types/user';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const fetcher = (url: string) => fetch(url)
 .then((res) => res.json())
@@ -30,9 +31,9 @@ async function sendRequest(url: string, { arg }: { arg: Group }) {
   })
 }
 
-export default function Users() {
+export default function Groups() {
   const { data: session } = useSession()
-  const { data: groups } = useSWR('/api/groups', fetcher, {
+  const { data: groups, isLoading } = useSWR('/api/groups', fetcher, {
     keepPreviousData: true,
   })
   const { trigger } = useSWRMutation('/api/groups', sendRequest)
@@ -137,6 +138,13 @@ export default function Users() {
           <span>Included By</span>
           <span>Included At</span>
         </div>
+        {isLoading && (
+        <div className='grid grid-cols-3 p-2 space-x-4 hover:bg-accent rounded-md'>
+          <Skeleton className="h-4" />
+          <Skeleton className="h-4" />
+          <Skeleton className="h-4" />
+        </div>
+        )}
         {groups?.map((group) => (
           <div key={group.id} className='grid grid-cols-3 p-2 hover:bg-accent rounded-md'>
             <Link 
