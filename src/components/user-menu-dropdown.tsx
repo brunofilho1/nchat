@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { buttonVariants } from "./ui/button";
-import { MessageCircleIcon, PowerIcon, SettingsIcon } from "lucide-react";
+import { MessageCircleIcon, PowerIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const UserMenuDropdown = () => {
@@ -44,14 +44,14 @@ const UserMenuDropdown = () => {
           <span>Chat</span>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
-
         <DropdownMenuItem
-          onClick={() => route.push('/settings')}
+          onClick={() => route.push('/profile')}
           className="space-x-1">
-          <SettingsIcon size={16} />
-          <span>Settings</span>
+          <UserIcon size={16} />
+          <span>Profile</span>
         </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
 
         <DropdownMenuItem
           onClick={() => signOut()}
