@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { buttonVariants } from "./ui/button";
-import { MessageCircleIcon, PowerIcon, UserIcon } from "lucide-react";
+import { MessageCircleIcon, PowerIcon, UserIcon, UsersIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const UserMenuDropdown = () => {
@@ -37,6 +37,13 @@ const UserMenuDropdown = () => {
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          onClick={() => route.push('/groups')} 
+          className="space-x-1">
+          <UsersIcon size={16} />
+          <span>Groups</span>
+        </DropdownMenuItem>
+
         <DropdownMenuItem 
           onClick={() => route.push('/chat')} 
           className="space-x-1">
