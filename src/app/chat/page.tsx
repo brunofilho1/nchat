@@ -7,10 +7,13 @@ import { Input } from '@/components/ui/input';
 import { SendHorizonalIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation';
 import { v4 as uuid } from 'uuid'
+import { Socket, io } from 'socket.io-client';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const fetcher = (url: string) => fetch(url)
 .then((res) => res.json())
@@ -23,24 +26,54 @@ async function sendRequest(url: string, { arg }: { arg: Message }) {
   })
 }
 
+interface SocketMessage extends Message  {
+  groupId: string
+}
+
+const socket = io("http://localhost:3001")
+
 export default function Chat() {
+  const router = useRouter()
+  const groupId = useSearchParams().get('group')
   const { data: session } = useSession()
-  const { data } = useSWR('/api/messages', fetcher, {
-    keepPreviousData: true,
+  const { data: messages, mutate } = useSWR('/api/messages', fetcher, {
+    keepPreviousData: false,
+    revalidateOnFocus: false,
   })
   const { trigger } = useSWRMutation('/api/messages', sendRequest)
-  const [newMessage, setNewMessage] = useState('')
+  const [message, setMessage] = useState('')
 
-  const handleSubmit = () => {
-    trigger({
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const newMessage: Message = {
       id: uuid(),
       author: session?.user as User,
-      body: newMessage,
+      body: message,
       includedAt: new Date()
-    })
+    }
+    
+    trigger(newMessage)
+    
+    socket?.emit('send_message', {
+      ...newMessage,
+      groupId,
+    });
 
-    return setNewMessage('')
+    return setMessage('')
   }
+
+  useEffect(() => {
+    socket?.emit("join_group", groupId);
+    socket?.on('receive_message', (data: SocketMessage) => {
+      const newMessage: Message = {
+        ...data
+      }
+      mutate([newMessage])
+    })
+  }, [])
+
+  if (!groupId) router.push('/groups')
   
   return (
     <main className="flex flex-col justify-between w-full min-h-[calc(100vh-4rem)] max-w-[650px] my-2 border rounded-md lg:max-w-[600px] m-auto space-y-6 py-6">
@@ -58,9 +91,9 @@ export default function Chat() {
         <h1>Chat</h1>
       </div>
 
-      <div className='w-full flex flex-col space-y-2 px-4'>
-        {data && data?.length > 0 ? (
-          data?.map((message) => (
+      <div className="h-[calc(100vh-14rem)] overflow-y-scroll w-full flex flex-col space-y-2 px-4">
+        {messages && messages?.length > 0 ? (
+          messages?.map((message) => (
             <div 
               data-itsme={message.author.email === session?.user?.email} 
               key={message.id} 
@@ -89,11 +122,11 @@ export default function Chat() {
 
       <form onSubmit={handleSubmit} className='flex items-center px-10 space-x-2'>
         <Input 
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           placeholder='Type your message here...' 
         />
-        <Button type='button' onClick={handleSubmit}>
+        <Button type='submit'>
           <SendHorizonalIcon size={16} />
         </Button>
       </form>

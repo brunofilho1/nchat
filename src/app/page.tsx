@@ -1,7 +1,8 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
-import { GithubIcon } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
 import { signIn } from "next-auth/react";
 
 export default function Home() {
@@ -13,18 +14,28 @@ export default function Home() {
           <span className="">A web chat built with Next.js and Socket.io</span>
         </div>
 
-        <div>
+        <div className="space-y-2">
           <Button 
-            className="w-full bg-slate-500 hover:bg-slate-700 text-white"
+            className="w-full bg-slate-500 hover:bg-slate-700 text-white space-x-1"
             onClick={async () => {
-              'use client'
               await signIn('github', {
-                callbackUrl: 'http://localhost:3000/chat'
+                callbackUrl: 'http://localhost:3000/groups'
               })
             }}
           >
-            <GithubIcon size={16} />
-            Github
+            <FaGithub size={16} />
+            <span>Github</span>
+          </Button>
+          <Button 
+            className="w-full space-x-1"
+            onClick={async () => {
+              await signIn('google', {
+                callbackUrl: 'http://localhost:3000/groups'
+              })
+            }}
+          >
+            <FcGoogle size={16} />
+            <span>Google</span>
           </Button>
         </div>
       </main>
