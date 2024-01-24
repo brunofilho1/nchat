@@ -14,6 +14,8 @@ import { v4 as uuid } from 'uuid'
 import { Socket, io } from 'socket.io-client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Spinner from '@/components/spinner';
+import EmptyMessages from '@/components/empty-messages';
 
 const fetcher = (url: string) => fetch(url)
 .then((res) => res.json())
@@ -36,7 +38,7 @@ export default function Chat() {
   const router = useRouter()
   const groupId = useSearchParams().get('group')
   const { data: session } = useSession()
-  const { data: messages, mutate } = useSWR('/api/messages', fetcher, {
+  const { data: messages, isLoading, mutate } = useSWR('/api/messages', fetcher, {
     keepPreviousData: false,
     revalidateOnFocus: false,
   })
@@ -92,7 +94,10 @@ export default function Chat() {
       </div>
 
       <div className="h-[calc(100vh-14rem)] overflow-y-scroll w-full flex flex-col space-y-2 px-4">
-        {messages && messages?.length > 0 ? (
+        {isLoading && <Spinner />}
+        {messages && messages.length === 0 ? (
+          <EmptyMessages />
+        ): (
           messages?.map((message) => (
             <div 
               data-itsme={message.author.email === session?.user?.email} 
@@ -115,8 +120,6 @@ export default function Chat() {
               <p>{message.body}</p>
             </div>
           ))
-        ): (
-          <p>Empty messages</p>
         )}
       </div>
 
