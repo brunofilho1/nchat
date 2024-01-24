@@ -1,15 +1,15 @@
 'use server'
 
-import { randomUUID } from "crypto";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { Group } from "@/@types/group";
+import { NextApiRequest } from "next";
 
 var groups: Group[] = [
   {
     id: 'NZBNssJHD-asdAZXnnAd-JjkaA90LÇ0d-AJKKsd7656asA',
     name: 'Main',
-    color: '#124565',
+    color: '#fcba03',
     author: {
       name: 'System',
       email: 'system@google.com',
@@ -19,10 +19,14 @@ var groups: Group[] = [
   }
 ]
 
-export async function GET() { 
+export async function GET(req: NextApiRequest) {
   const session = await getServerSession(authOptions)
 
+  const groupId = new URL(req.url!).searchParams.get('groupId')
+
   if (session) {
+    if (groupId) return Response.json({ data: groups.find((g) => g.id === groupId) })
+
     return Response.json({ data: groups })
   }
 

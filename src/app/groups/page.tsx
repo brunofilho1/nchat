@@ -150,7 +150,6 @@ export default function Groups() {
                   group: group.id,
                 },
               }}
-              target='_blank' 
               className='text-blue-400 hover:underline'
             >
               {group.name}
