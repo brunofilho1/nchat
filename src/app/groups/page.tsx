@@ -19,11 +19,7 @@ import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { User } from '@/@types/user';
 import { Skeleton } from '@/components/ui/skeleton';
-
-const fetcher = (url: string) => fetch(url)
-.then((res) => res.json())
-.then((res) => res.data as Group[])
-
+import { fetcher } from '@/lib/swr';
 async function sendRequest(url: string, { arg }: { arg: Group }) {
   return fetch(url, {
     method: 'POST',
@@ -33,7 +29,7 @@ async function sendRequest(url: string, { arg }: { arg: Group }) {
 
 export default function Groups() {
   const { data: session } = useSession()
-  const { data: groups, isLoading } = useSWR('/api/groups', fetcher, {
+  const { data: groups, isLoading } = useSWR<Group[]>('/api/groups', fetcher, {
     keepPreviousData: true,
   })
   const { trigger } = useSWRMutation('/api/groups', sendRequest)

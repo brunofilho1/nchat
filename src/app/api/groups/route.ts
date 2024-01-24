@@ -7,7 +7,7 @@ import { Group } from "@/@types/group";
 
 var groups: Group[] = [
   {
-    id: randomUUID(),
+    id: 'NZBNssJHD-asdAZXnnAd-JjkaA90LÇ0d-AJKKsd7656asA',
     name: 'Main',
     color: '#124565',
     author: {
