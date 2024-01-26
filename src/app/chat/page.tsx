@@ -76,7 +76,6 @@ export default function Chat() {
   }
 
   useEffect(() => {
-    socket?.emit("join_group", { groupId, user: session?.user });
     socket?.on('receive_message', (data: SocketMessage) => {
       const newMessage: Message = {
         ...data
@@ -89,7 +88,8 @@ export default function Chat() {
     })
 
     return () => {
-      socket?.emit("leave_group", { groupId })
+      socket?.emit("leave_group", groupId)
+      socket.off('receive_message')
     }
   }, [])
 
