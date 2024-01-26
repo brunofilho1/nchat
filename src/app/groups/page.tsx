@@ -91,7 +91,7 @@ export default function Groups() {
                     name: e.target.value,
                   })}
                   required
-                  className="col-span-2 h-8"
+                  className="h-8"
                 />
                 </div>
 
@@ -106,7 +106,7 @@ export default function Groups() {
                       color: e.target.value
                     })}
                     required
-                    className="col-span-2 h-8"
+                    className="h-8 p-0"
                   />
                 </div>                
 
