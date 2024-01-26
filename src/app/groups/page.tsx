@@ -10,6 +10,7 @@ import { fetcher } from '@/lib/swr';
 import AddGroupButton from './components/add-group-button';
 import { useState } from 'react';
 import { useDebounceValue } from '../hooks/useDebounce';
+import EmptyGroups from '@/components/empty-groups';
 
 export default function Groups() {
   const [search, setSearch] = useState('')
@@ -64,6 +65,7 @@ export default function Groups() {
             <span>{new Date(group.includedAt).toLocaleDateString()}</span>
           </div>
         ))}
+        {groups?.length === 0 && <EmptyGroups />}
       </div>
     </main>
   );
