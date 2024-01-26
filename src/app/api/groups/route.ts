@@ -21,11 +21,13 @@ var groups: Group[] = [
 
 export async function GET(req: NextApiRequest) {
   const session = await getServerSession(authOptions)
-
   const groupId = new URL(req.url!).searchParams.get('groupId')
+  const search = new URL(req.url!).searchParams.get('search')
 
   if (session) {
     if (groupId) return Response.json({ data: groups.find((g) => g.id === groupId) })
+    
+    if (search) return Response.json({ data: groups.filter((g) => g.name.includes(search) || g.author.name.includes(search)) })
 
     return Response.json({ data: groups })
   }
