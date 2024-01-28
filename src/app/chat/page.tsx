@@ -10,7 +10,6 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation';
-import { v4 as uuid } from 'uuid'
 import { useRouter, useSearchParams } from 'next/navigation';
 import Spinner from '@/components/spinner';
 import EmptyMessages from '@/components/empty-messages';
@@ -22,6 +21,7 @@ import { cn } from '@/lib/utils';
 import GroupDropdown from '@/components/group-dropdown';
 import { useAtom } from 'jotai';
 import { socketConnection } from '@/atoms/socket.atom';
+import MessageCard from './components/message-card';
 
 async function sendRequest(url: string, { arg }: { arg: Message }) {
   return fetch(url, {
@@ -39,38 +39,48 @@ export default function Chat() {
   const [socket] = useAtom(socketConnection)
   const groupId = useSearchParams().get('group')
   const { data: session } = useSession()
-  const { data, isLoading } = useSWR<Message[]>('/api/messages', fetcher, {
+  const { data, isLoading } = useSWR<Message[]>(`/api/messages?groupId=${groupId}`, fetcher, {
     keepPreviousData: false,
     revalidateOnFocus: false,
   })
   const { data: group } = useSWR<Group>(`/api/groups?groupId=${groupId}`, fetcher, {
     keepPreviousData: true,
   })
-  const [messages, setMessages] = useState(data || [])
+  const [messages, setMessages] = useState<Message[]>(data || [])
   const { trigger } = useSWRMutation('/api/messages', sendRequest)
   const [message, setMessage] = useState('')
   const chatContainerRef = useRef<any>(null);
+
+  useEffect(() => {
+    data && setMessages(data)
+  }, [data])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const newMessage: Message = {
-      id: uuid(),
+      groupId: group?.id as string,
       author: session?.user as User,
       body: message,
       includedAt: new Date()
     }
 
     trigger(newMessage)
+    .then(async (res) => await res.json())
+    .then((res) => {
+      socket?.emit('send_message', {
+        ...newMessage,
+        groupId,
+        _id: res.data.insertedId
+      } as Message);
 
-    setMessages((prevState) => {
-      return [...prevState, newMessage]
+      setMessages((prevState) => {
+        return [...prevState, {
+          ...newMessage,
+          _id: res.data.insertedId
+        }]
+      })
     })
-
-    socket?.emit('send_message', {
-      ...newMessage,
-      groupId,
-    });
 
     return setMessage('')
   }
@@ -113,26 +123,7 @@ export default function Chat() {
           <EmptyMessages />
         ) : (
           messages?.map((message) => (
-            <div
-              data-itsme={message.author.email === session?.user?.email}
-              key={message.id}
-              className='data-[itsme=true]:self-end border p-4 w-fit rounded-md'
-            >
-              <div className='flex items-center space-x-4 justify-between'>
-                <div className='flex items-center space-x-2 text-muted-foreground'>
-                  <Image
-                    width={20}
-                    height={20}
-                    className='rounded-full'
-                    src={message.author.image as string}
-                    alt="User Avatar"
-                  />
-                  <span>{message.author.name}</span>
-                </div>
-                <span className='text-sm text-muted-foreground'>{new Date(message.includedAt).toLocaleTimeString()}</span>
-              </div>
-              <p>{message.body}</p>
-            </div>
+            <MessageCard key={message._id} message={message} />
           ))
         )}
       </div>

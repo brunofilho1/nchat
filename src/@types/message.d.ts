@@ -1,7 +1,8 @@
 import { User } from "./user"
 
 export interface Message {
-  id: string
+  _id?: string
+  groupId: string
   author: User
   body: string
   includedAt: Date

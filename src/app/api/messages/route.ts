@@ -1,27 +1,19 @@
 'use server'
 
-import { Message } from "@/@types/message"
-import { randomUUID } from "crypto";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
+import connectMongo from "@/lib/mongodb";
 
-var messages: Message[] = [
-  // {
-  //   id: randomUUID(),
-  //   body: 'testing message from my api routes',
-  //   author: {
-  //     name: 'Lupi Oliveira',
-  //     email: 'lupi@google.com',
-  //     image: 'https://picsum.photos/200/200'
-  //   },
-  //   includedAt: new Date()
-  // },
-]
 
-export async function GET() { 
+export async function GET(req: Request) { 
   const session = await getServerSession(authOptions)
+  const groupId = new URL(req.url!).searchParams.get('groupId')
 
-  if (session) {
+  const client = await connectMongo();
+  const db = client?.db('nchat').collection('messages')
+
+  if (session && groupId) {
+    const messages = await db?.find({ groupId }).toArray() || []
     return Response.json({ data: messages })
   }
 
@@ -29,9 +21,14 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const newMessage: Message = await req.json();
+  const client = await connectMongo();
+  const db = client?.db('nchat').collection('messages')
 
-  messages.push(newMessage);
+  try {
+    const message = await db?.insertOne(await req.json())
 
-  return Response.json({ data: messages });
+    return Response.json({ data: message, message: 'New message saved successfully!', status: 200 });
+  } catch (error) {
+    return Response.json({ message: 'Something went wrong when saving the new message!', error: error, status: 500 });
+  }
 }
