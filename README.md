@@ -16,6 +16,7 @@ This project was built with the following tools
 - [Next.js](https://nextjs.org/)
 - [NextAuth.js](https://next-auth.js.org/)
 - [Socket.io](https://socket.io/)
+- [MongoDB](https://mongodb.com/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Radix-UI](https://www.radix-ui.com/)
 - [Shadcn/UI](https://ui.shadcn.com/)
