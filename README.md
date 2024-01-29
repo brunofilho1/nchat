@@ -35,10 +35,13 @@ $ cd nchat
 ## 🚀 Configure your GitHub App or Google Oauth Client, then fill in the .env.local file
 
 ```bash
+MONGODB_URI=
 LOCAL_AUTH_URL=
 NEXTAUTH_SECRET=""
 GITHUB_APP_CLIENT_ID=""
 GITHUB_APP_CLIENT_SECRET=""
+GOOGLE_APP_CLIENT_ID=""
+GOOGLE_APP_CLIENT_SECRET=""
 ```
 
 ## 🚀 How to start the App
