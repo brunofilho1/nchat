@@ -14,9 +14,9 @@ export async function GET(req: NextApiRequest) {
     const db = client?.db('nchat').collection('groups')
 
     if (session) {
-      if (search) return Response.json({ data: await db?.findOne({ "name": { $regex: search } }) })
+      if (search) return Response.json({ data: await db?.find({ "name": { '$regex': search, '$options' : 'i' } }).toArray() })
 
-      return Response.json({ data: await db?.find({}).toArray() || [] })
+      return Response.json({ data: await db?.find().toArray() || [] })
     }
 
     return Response.json({ message: "Unauthorized" });
