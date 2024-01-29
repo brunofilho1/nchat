@@ -16,12 +16,12 @@ export async function GET(req: NextApiRequest) {
     if (session) {
       if (search) return Response.json({ data: await db?.find({ "name": { '$regex': search, '$options' : 'i' } }).toArray() })
 
-      return Response.json({ data: await db?.find().toArray() || [] })
+      return Response.json({ data: await db?.find().toArray() || [] }, { status: 200 })
     }
 
-    return Response.json({ message: "Unauthorized" });
+    return Response.json({ message: "You're not authorized to perform this action", error: 'Unauthorized' }, { status: 500 });
   } catch (error) {
-    return Response.json({ message: 'Something went wrong when searching the groups!', error: error, status: 500 })
+    return Response.json({ message: 'Something went wrong when searching the groups!', error: error }, { status: 500 })
   }
 }
 
@@ -35,11 +35,11 @@ export async function POST(req: Request) {
     if (session) {
       const group = await db?.insertOne(await req.json())
 
-      return Response.json({ data: group, group: 'New group saved successfully!', status: 200 });
+      return Response.json({ data: group, group: 'New group saved successfully!' }, { status: 200 });
     }
 
-    return Response.json({ message: "Unauthorized" });
+    return Response.json({ message: "You're not authorized to perform this action", error: 'Unauthorized' }, { status: 500 });
   } catch (error) {
-    return Response.json({ message: 'Something went wrong when saving the new group!', error: error, status: 500 });
+    return Response.json({ message: 'Something went wrong when saving the new group!', error: error }, { status: 500 });
   }
 }

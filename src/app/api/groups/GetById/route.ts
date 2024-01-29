@@ -14,11 +14,11 @@ export async function GET(req: NextApiRequest) {
   
     if (session) {
       const group = await db?.findOne({ "_id": new BSON.ObjectId(groupId as string) })
-      return Response.json({ data: group })
+      return Response.json({ data: group }, { status: 200 })
     }
     
-    return Response.json({ message: "Unauthorized" });
+    return Response.json({ message: "You're not authorized to perform this action", error: 'Unauthorized' }, { status: 500 });
   } catch (error) {
-    return Response.json({ message: 'Something went wrong when search the group!', error: error, status: 500 })
+    return Response.json({ message: 'Something went wrong when search the group!', error: error }, { status: 500 })
   }
 }

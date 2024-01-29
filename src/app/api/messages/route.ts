@@ -5,30 +5,41 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import connectMongo from "@/lib/mongodb";
 
 
-export async function GET(req: Request) { 
+export async function GET(req: Request) {
   const session = await getServerSession(authOptions)
   const groupId = new URL(req.url!).searchParams.get('groupId')
 
-  const client = await connectMongo();
-  const db = client?.db('nchat').collection('messages')
-
-  if (session && groupId) {
-    const messages = await db?.find({ groupId }).toArray() || []
-    return Response.json({ data: messages })
+  try {
+    const client = await connectMongo();
+    const db = client?.db('nchat').collection('messages')
+  
+    if (session && groupId) {
+      const messages = await db?.find({ groupId }).toArray() || []
+      return Response.json({ data: messages }, { status: 200 })
+    }
+  
+    return Response.json({ message: "You're not authorized to perform this action", error: 'Unauthorized' }, { status: 500 });
+  } catch (error) {
+    return Response.json({ message: 'Something went wrong when saving the new message!', error: error }, { status: 500 });
   }
 
-  return Response.json({ message: "Unauthorized" });
 }
 
 export async function POST(req: Request) {
-  const client = await connectMongo();
-  const db = client?.db('nchat').collection('messages')
-
+  const session = await getServerSession(authOptions)
+  
   try {
-    const message = await db?.insertOne(await req.json())
+    const client = await connectMongo();
+    const db = client?.db('nchat').collection('messages')
 
-    return Response.json({ data: message, message: 'New message saved successfully!', status: 200 });
+    if (session) {
+      const message = await db?.insertOne(await req.json())
+  
+      return Response.json({ data: message, message: 'New message saved successfully!' }, { status: 200 });
+    }
+
+    return Response.json({ message: "You're not authorized to perform this action", error: 'Unauthorized' }, { status: 500 });
   } catch (error) {
-    return Response.json({ message: 'Something went wrong when saving the new message!', error: error, status: 500 });
+    return Response.json({ message: 'Something went wrong when saving the new message!', error: error }, { status: 500 });
   }
 }
