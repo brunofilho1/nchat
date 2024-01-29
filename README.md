@@ -1,6 +1,6 @@
 ## 💻 About
 
-A web chat built with React 18, Next.js 14, NextAuth.js 4, Shadcn-Ui and Socket.io 4.
+A web chat built with React 18, Next.js 14, NextAuth.js 4, Shadcn-Ui,Socket.io 4 and MongoDB 6.
 
 <div align="center">
   <img width="900px" alt="Chat Page" src="github/chat.png" />
