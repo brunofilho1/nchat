@@ -43,7 +43,7 @@ export default function Chat() {
     keepPreviousData: false,
     revalidateOnFocus: false,
   })
-  const { data: group } = useSWR<Group>(`/api/groups?groupId=${groupId}`, fetcher, {
+  const { data: group } = useSWR<Group>(`/api/groups/GetById?groupId=${groupId}`, fetcher, {
     keepPreviousData: true,
   })
   const [messages, setMessages] = useState<Message[]>(data || [])
@@ -59,7 +59,7 @@ export default function Chat() {
     e.preventDefault()
 
     const newMessage: Message = {
-      groupId: group?.id as string,
+      groupId: group?._id as string,
       author: session?.user as User,
       body: message,
       includedAt: new Date()

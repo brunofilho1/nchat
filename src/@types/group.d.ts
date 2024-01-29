@@ -1,5 +1,5 @@
 export interface Group {
-  id: string
+  _id: string
   author: User
   name: string
   color: string

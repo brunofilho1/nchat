@@ -49,12 +49,12 @@ export default function Groups() {
           </div>
         )}
         {groups?.map((group) => (
-          <div key={group.id} className='grid grid-cols-3 p-2 hover:bg-accent rounded-md'>
+          <div key={group._id} className='grid grid-cols-3 p-2 hover:bg-accent rounded-md'>
             <Link
               href={{
                 pathname: '/chat',
                 query: {
-                  group: group.id,
+                  group: group._id,
                 },
               }}
               className='text-blue-400 hover:underline'

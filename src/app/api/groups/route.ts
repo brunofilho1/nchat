@@ -2,43 +2,44 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { Group } from "@/@types/group";
 import { NextApiRequest } from "next";
-
-var groups: Group[] = [
-  {
-    id: 'NZBNssJHD-asdAZXnnAd-JjkaA90LÇ0d-AJKKsd7656asA',
-    name: 'Main',
-    color: '#fcba03',
-    author: {
-      name: 'System',
-      email: 'system@google.com',
-      image: 'https://picsum.photos/200/200'
-    },
-    includedAt: new Date()
-  }
-]
+import connectMongo from "@/lib/mongodb";
 
 export async function GET(req: NextApiRequest) {
   const session = await getServerSession(authOptions)
-  const groupId = new URL(req.url!).searchParams.get('groupId')
   const search = new URL(req.url!).searchParams.get('search')
 
-  if (session) {
-    if (groupId) return Response.json({ data: groups.find((g) => g.id === groupId) })
-    
-    if (search) return Response.json({ data: groups.filter((g) => g.name.includes(search) || g.author.name.includes(search)) })
+  try {
+    const client = await connectMongo();
+    const db = client?.db('nchat').collection('groups')
 
-    return Response.json({ data: groups })
+    if (session) {
+      if (search) return Response.json({ data: await db?.findOne({ "name": { $regex: search } }) })
+
+      return Response.json({ data: await db?.find({}).toArray() || [] })
+    }
+
+    return Response.json({ message: "Unauthorized" });
+  } catch (error) {
+    return Response.json({ message: 'Something went wrong when searching the groups!', error: error, status: 500 })
   }
-
-  return Response.json({ message: "Unauthorized" });
 }
 
 export async function POST(req: Request) {
-  const newGroup: Group = await req.json();
+  const session = await getServerSession(authOptions)
 
-  groups.push(newGroup);
+  try {
+    const client = await connectMongo();
+    const db = client?.db('nchat').collection('groups')
 
-  return Response.json({ data: groups });
+    if (session) {
+      const group = await db?.insertOne(await req.json())
+
+      return Response.json({ data: group, group: 'New group saved successfully!', status: 200 });
+    }
+
+    return Response.json({ message: "Unauthorized" });
+  } catch (error) {
+    return Response.json({ message: 'Something went wrong when saving the new group!', error: error, status: 500 });
+  }
 }

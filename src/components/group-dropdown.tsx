@@ -31,7 +31,7 @@ const GroupDropdown = ({ group }: GroupDropdownProps) => {
   const [onlineUsers, setOnlineUsers] = useState<SocketUser[]>([])
 
   useEffect(() => {
-    socket?.emit("join_group", group?.id, session?.user, (users: SocketUser[]) => { setOnlineUsers(users) });
+    socket?.emit("join_group", group?._id, session?.user, (users: SocketUser[]) => { setOnlineUsers(users) });
 
     socket?.on('join_group', (user: SocketUser) => {
       console.log('USER JOINED TO ROOM => ', user)
