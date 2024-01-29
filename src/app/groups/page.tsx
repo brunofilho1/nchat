@@ -57,7 +57,10 @@ export default function Groups() {
                   group: group._id,
                 },
               }}
-              className='text-blue-400 hover:underline'
+              className='hover:underline font-semibold'
+              style={{
+                color: group?.color
+              }}
             >
               {group.name}
             </Link>
