@@ -43,7 +43,7 @@ export default function Chat() {
     keepPreviousData: false,
     revalidateOnFocus: false,
   })
-  const { data: group } = useSWR<Group>(`/api/groups/GetById?groupId=${groupId}`, fetcher, {
+  const { data: group } = useSWR<Group>(`/api/groups/getById?groupId=${groupId}`, fetcher, {
     keepPreviousData: true,
   })
   const [messages, setMessages] = useState<Message[]>(data || [])
@@ -97,9 +97,18 @@ export default function Chat() {
       chatContainerRef.current.scrollIntoView({ behavior: 'smooth' })
     })
 
+    socket?.on('delete_message', (messageToDelete: SocketMessage) => {
+      setMessages((prevState) => {
+        return [...prevState.filter((m) => m._id !== messageToDelete._id)]
+      })
+
+      chatContainerRef.current.scrollIntoView({ behavior: 'smooth' })
+    })
+
     return () => {
       socket?.emit("leave_group", groupId)
       socket.off('receive_message')
+      socket.off('delete_message')
     }
   }, [])
 
@@ -123,7 +132,7 @@ export default function Chat() {
           <EmptyMessages />
         ) : (
           messages?.map((message) => (
-            <MessageCard key={message._id} message={message} />
+            <MessageCard key={message._id} message={message} setMessages={setMessages} />
           ))
         )}
       </div>

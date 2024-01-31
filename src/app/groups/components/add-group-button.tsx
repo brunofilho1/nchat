@@ -7,7 +7,6 @@ import { PlusIcon, MessageCirclePlusIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import useSWRMutation from "swr/mutation";
 import { useState } from "react";
-import { v4 as uuid } from 'uuid'
 import { User } from "@/@types/user";
 import { Group } from "@/@types/group";
 
@@ -28,7 +27,6 @@ const AddGroupButton = () => {
 
   const handleSubmit = () => {
     trigger({
-      id: uuid(),
       author: session?.user as User,
       name: newGroup.name,
       color: newGroup.color,

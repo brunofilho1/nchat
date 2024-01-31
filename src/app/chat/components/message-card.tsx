@@ -1,17 +1,23 @@
 import { Message } from "@/@types/message";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
+import MessageOptionsDropdown from "./message-options-dropdown";
+import { Dispatch, SetStateAction } from "react";
 
-interface MessageCard { message: Message }
+interface MessageCard { 
+  message: Message, 
+  setMessages: Dispatch<SetStateAction<Message[]>> 
+}
 
-const MessageCard = ({ message }: MessageCard) => {
+const MessageCard = ({ message, setMessages }: MessageCard) => {
   const { data: session } = useSession()
   return (
     <div
       data-itsme={message.author.email === session?.user?.email}
       key={message._id}
-      className='data-[itsme=true]:self-end border p-4 w-fit rounded-md'
+      className='relative group data-[itsme=true]:self-end border p-4 w-fit rounded-md'
     >
+      <MessageOptionsDropdown message={message} setMessages={setMessages} />
       <div className='flex items-center space-x-4 justify-between'>
         <div className='flex items-center space-x-2 text-muted-foreground'>
           <Avatar className="h-6 w-6">
