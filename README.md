@@ -65,5 +65,3 @@ pnpm dev
 </div>
 
 ## 🌐 Live preview
-
-<!-- <a src="https://just-finished.vercel.app/" target="_blank">https://just-finished.vercel.app/</a> -->
