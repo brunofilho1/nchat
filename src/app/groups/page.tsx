@@ -11,6 +11,7 @@ import AddGroupButton from './components/add-group-button';
 import { useState } from 'react';
 import { useDebounceValue } from '../hooks/useDebounce';
 import EmptyGroups from '@/components/empty-groups';
+import GroupOptionsDropdown from '@/components/group-options-dropdown';
 
 export default function Groups() {
   const [search, setSearch] = useState('')
@@ -36,7 +37,7 @@ export default function Groups() {
       </div>
 
       <div className='border p-2 rounded-md'>
-        <div className='grid grid-cols-3 p-2 border-b rounded-md font-bold text-sm'>
+        <div className='grid grid-cols-4 p-2 border-b rounded-md font-bold text-sm'>
           <span>Name</span>
           <span>Included By</span>
           <span>Included At</span>
@@ -49,7 +50,7 @@ export default function Groups() {
           </div>
         )}
         {groups?.map((group) => (
-          <div key={group._id} className='grid grid-cols-3 p-2 hover:bg-accent rounded-md'>
+          <div key={group._id} className='grid grid-cols-4 p-2 hover:bg-accent rounded-md'>
             <Link
               href={{
                 pathname: '/chat',
@@ -66,6 +67,9 @@ export default function Groups() {
             </Link>
             <span>{group.author.name}</span>
             <span>{new Date(group.includedAt).toLocaleDateString()}</span>
+            <div className='flex justify-end'>
+              <GroupOptionsDropdown group={group} />
+            </div>
           </div>
         ))}
         {groups?.length === 0 && <EmptyGroups />}
