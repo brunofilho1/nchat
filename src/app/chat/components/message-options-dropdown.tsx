@@ -17,6 +17,7 @@ import { useSession } from "next-auth/react";
 import { Dispatch, SetStateAction } from "react";
 import { useAtom } from "jotai";
 import { socketConnection } from "@/atoms/socket.atom";
+import { toast } from "sonner";
 
 interface MessageOptionsDropdown {
   message: Message
@@ -37,9 +38,14 @@ const MessageOptionsDropdown = ({ message, setMessages }: MessageOptionsDropdown
 
   const handleDelete = () => {
     trigger(message)
-    .then(async (res) => await res.json())
-    .then((res) => {
-      console.log(res)
+    .then(async (res) => {
+      const response = await res.json()
+      if (res.status === 200) {
+        toast.success(response.message)
+      } else if (res.status === 500) {
+        toast.error(response.message)
+      }
+
       setMessages((prevState) => {
         return [...prevState.filter((m) => m !== message)]
       })

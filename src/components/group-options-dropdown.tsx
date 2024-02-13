@@ -13,6 +13,7 @@ import { ExternalLinkIcon, MoreHorizontalIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Group } from "@/@types/group";
 import useSWRMutation from "swr/mutation";
+import { toast } from "sonner";
 
 interface GroupOptionsDropdownProps {
   group: Group
@@ -33,9 +34,10 @@ const GroupOptionsDropdown = ({ group }: GroupOptionsDropdownProps) => {
 
   const handleDelete = () => {
     trigger(group)
-    .then(async (res) => await res.json())
-    .then((res) => {
-      console.log(res)
+    .then(async (res) => {
+      const response = await res.json()
+      if (res.status === 200) return toast.success(response.message)
+      if (res.status === 500) return toast.error(response.message)
     })
   }
 

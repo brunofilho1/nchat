@@ -14,10 +14,16 @@ import Image from "next/image";
 import { buttonVariants } from "./ui/button";
 import { MessageCircleIcon, PowerIcon, UserIcon, UsersIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const UserMenuDropdown = () => {
   const { data: session } = useSession()
   const route = useRouter()
+
+  const handleSignOut = async () => {
+    await signOut()
+    toast.success('Disconnected successfully!')
+  }
 
   return (
     <DropdownMenu>
@@ -61,7 +67,7 @@ const UserMenuDropdown = () => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onClick={() => signOut()}
+          onClick={handleSignOut}
           className="space-x-1">
           <PowerIcon size={16} />
           <span>Sign Out</span>

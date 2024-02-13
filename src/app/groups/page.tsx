@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useDebounceValue } from '../hooks/useDebounce';
 import EmptyGroups from '@/components/empty-groups';
 import GroupOptionsDropdown from '@/components/group-options-dropdown';
+import { toast } from 'sonner';
 
 export default function Groups() {
   const [search, setSearch] = useState('')
